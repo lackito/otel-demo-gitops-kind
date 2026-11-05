@@ -70,7 +70,7 @@ This keeps the log index healthy on one node without allocating a second node.
 To inspect the OpenSearch API locally:
 
 ```sh
-kubectl --context kind-otel-demo-kind -n opentelemetry-demo   port-forward svc/opensearch 9200:9200
+kubectl --context kind-otel-demo -n opentelemetry-demo   port-forward svc/opensearch 9200:9200
 ```
 
 In another terminal:
