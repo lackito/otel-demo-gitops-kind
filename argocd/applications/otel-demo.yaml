@@ -2,7 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 
 metadata:
-  name: otel-demo-local
+  name: otel-demo-kind
   namespace: argocd
 
 spec:
@@ -13,14 +13,15 @@ spec:
       chart: opentelemetry-demo
       targetRevision: 0.38.4
       helm:
+        releaseName: otel-demo
         valueFiles:
           - $values/applications/otel-demo/values.yaml
 
-    - repoURL: https://github.com/lackito/otel-demo-gitops-local.git
+    - repoURL: https://github.com/lackito/otel-demo-gitops-kind.git
       targetRevision: main
       ref: values
 
-    - repoURL: https://github.com/lackito/otel-demo-gitops-local.git
+    - repoURL: https://github.com/lackito/otel-demo-gitops-kind.git
       targetRevision: main
       path: applications/otel-demo/manifests
 

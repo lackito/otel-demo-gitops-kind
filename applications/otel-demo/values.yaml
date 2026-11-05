@@ -120,8 +120,8 @@ opensearch:
 
 components:
   recommendation:
-    # Direct development uses a local-<short-sha> image loaded into kind.
-    # Local CI replaces these fields with a full-SHA GHCR image.
+    # Keep verified pre-migration packages until kind release workflows
+    # promote real otel-demo-kind-* images. See README.md for the transition.
     imageOverride:
       repository: ghcr.io/lackito/otel-demo-local-recommendation
       tag: 65365294e879d28cd265a4c50896110ce526156c
@@ -149,7 +149,7 @@ components:
         value: '3900000'
   image-provider:
     mountedConfigMaps:
-      - name: local-feature-page
+      - name: kind-feature-page
         mountPath: /static/feature-editor-disabled.html
         subPath: feature-editor-disabled.html
         data:

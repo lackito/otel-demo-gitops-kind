@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: opensearch-local-log-settings
+  name: opensearch-kind-log-settings
   namespace: opentelemetry-demo
   annotations:
     argocd.argoproj.io/hook: PostSync
@@ -20,7 +20,7 @@ spec:
           command: ["/bin/sh", "-ec"]
           args:
             - |
-              curl --fail --silent --show-error --retry 20 --retry-connrefused --retry-delay 2                 -H 'Content-Type: application/json' -X PUT                 http://opensearch:9200/_index_template/otel-demo-local-logs                 --data-binary '{"index_patterns":["otel-logs-*"],"priority":200,"template":{"settings":{"number_of_replicas":0}}}'
+              curl --fail --silent --show-error --retry 20 --retry-connrefused --retry-delay 2                 -H 'Content-Type: application/json' -X PUT                 http://opensearch:9200/_index_template/otel-demo-kind-logs                 --data-binary '{"index_patterns":["otel-logs-*"],"priority":200,"template":{"settings":{"number_of_replicas":0}}}'
               curl --fail --silent --show-error --retry 20 --retry-connrefused --retry-delay 2                 -H 'Content-Type: application/json' -X PUT                 'http://opensearch:9200/otel-logs-*/_settings?allow_no_indices=true&ignore_unavailable=true'                 --data-binary '{"index":{"number_of_replicas":0}}'
           resources:
             requests:
