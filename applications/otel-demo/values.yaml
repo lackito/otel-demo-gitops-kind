@@ -139,8 +139,8 @@ components:
       pullPolicy: IfNotPresent
   ad:
     imageOverride:
-      repository: ghcr.io/lackito/otel-demo-local-ad
-      tag: 4529f2318533276792452178c41b51e6655f7970
+      repository: ghcr.io/lackito/otel-demo-kind-ad
+      tag: c21a8d0a7b63f759d68c3d8d5bddd7db922e6368
       pullPolicy: IfNotPresent
   frontend:
     # 65 minutes exceeds Envoy's one-hour upstream idle timeout.
