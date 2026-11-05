@@ -123,8 +123,8 @@ components:
     # Keep verified pre-migration packages until kind release workflows
     # promote real otel-demo-kind-* images. See README.md for the transition.
     imageOverride:
-      repository: ghcr.io/lackito/otel-demo-local-recommendation
-      tag: 65365294e879d28cd265a4c50896110ce526156c
+      repository: ghcr.io/lackito/otel-demo-kind-recommendation
+      tag: f755f4545c15a4ac3d34b62fc2648e89d5f68746
       pullPolicy: IfNotPresent
 
   flagd:
