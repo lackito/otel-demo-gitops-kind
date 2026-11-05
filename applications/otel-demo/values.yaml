@@ -134,8 +134,8 @@ components:
     sidecarContainers: []
   product-catalog:
     imageOverride:
-      repository: ghcr.io/lackito/otel-demo-local-product-catalog
-      tag: 5e4dfc2df6ccf53f3c26338f35096dc70993de0b
+      repository: ghcr.io/lackito/otel-demo-kind-product-catalog
+      tag: f755f4545c15a4ac3d34b62fc2648e89d5f68746
       pullPolicy: IfNotPresent
   ad:
     imageOverride:
