@@ -120,8 +120,7 @@ opensearch:
 
 components:
   recommendation:
-    # Keep verified pre-migration packages until kind release workflows
-    # promote real otel-demo-kind-* images. See README.md for the transition.
+    # Promoted by the Recommendation kind release workflow.
     imageOverride:
       repository: ghcr.io/lackito/otel-demo-kind-recommendation
       tag: f755f4545c15a4ac3d34b62fc2648e89d5f68746

@@ -1,105 +1,77 @@
 # otel-demo-gitops-kind
 
-GitOps desired state for the OpenTelemetry Demo running on the local kind
-cluster. This repository is the local counterpart to `otel-demo-gitops-aws`, which
-remains dedicated to AWS.
+Local kind desired state for the
+[OpenTelemetry Demo](https://opentelemetry.io/docs/demo/). Argo CD combines the
+upstream chart with these values and Gateway API manifests.
 
-See the
-[AWS and local project walkthrough](https://github.com/lackito/otel-demo-infra-kind/blob/main/docs/PROJECT_WALKTHROUGH.md)
-for the shared source-to-Argo CD delivery model.
+## Files and ownership
 
-## Repository structure
+| Path | Purpose |
+| --- | --- |
+| [Application](argocd/applications/otel-demo.yaml) | Chart version, sources, destination, and sync policy |
+| [Values](applications/otel-demo/values.yaml) | Local resources, telemetry, and Ad/Product Catalog/Recommendation images |
+| [Manifests](applications/otel-demo/manifests/) | Gateway, HTTPRoute, and OpenSearch log-index settings |
 
-```text
-otel-demo-gitops-kind/
-├── argocd/
-│   └── applications/
-│       └── otel-demo.yaml
-│
-└── applications/
-    └── otel-demo/
-        ├── values.yaml
-        └── manifests/
-            ├── gateway.yaml
-            └── httproute.yaml
-```
+[otel-demo-infra-kind](https://github.com/lackito/otel-demo-infra-kind) creates
+the cluster, installs the platform, and registers the Application through
+Terraform. Keep its registration and the declarative Application YAML aligned
+when changing chart sources or sync settings. This repository owns local
+application configuration; source and releases live in
+[otel-demo-apps](https://github.com/lackito/otel-demo-apps).
 
-The local Terraform source repository, `otel-demo-infra-kind`, installs Argo CD in
-its platform stage and registers an Application from its separate applications
-stage. That Application watches `applications/otel-demo` on `main`. Argo CD
-combines the pinned upstream OpenTelemetry Demo Helm chart with this
-repository's values and local Gateway API resources.
+## Releases
 
-## Responsibilities
+Qualifying changes on `otel-demo-apps/kind` trigger per-service ARM64 builds.
+Each workflow publishes `ghcr.io/lackito/otel-demo-kind-<service>:<full-sha>`,
+verifies public access, and updates that service's image override here.
+Argo CD watches `main` and reconciles Application `otel-demo-kind`.
 
-This repository owns:
+All three custom services use these GHCR packages: Ad, Product Catalog, and
+Recommendation. The repository must be public for anonymous Argo CD access, or
+Argo CD must have repository credentials. Images must also be accessible.
 
-- the declarative local Argo CD Application definition;
-- local Helm value overrides;
-- the local `Gateway` and `HTTPRoute`;
-- verified Recommendation, Product Catalog, and Ad image selection.
+From `otel-demo-infra-kind`, run `make application-validate` and compare its
+three service image references with their release SHAs. Check running platform
+digests against the corresponding image-index members when comparing image IDs.
+See [local operations](https://github.com/lackito/otel-demo-infra-kind/blob/main/docs/OPERATIONS.md)
+for setup, validation, browser access, and teardown.
 
-It does not own the kind cluster, Argo CD installation, NGINX Gateway Fabric,
-application source, or AWS desired state.
+## Telemetry
 
-## Delivery flow
+Traces go to Jaeger, metrics to Prometheus, and logs to OpenSearch. Grafana
+provisions all three data sources together. In Explore, select OpenSearch and
+search `otel-logs-*`, filtering by service. The data source uses daily indices.
 
-Pushes to the `kind` branch of `otel-demo-apps` publish per-service ARM64
-images to GHCR and update `applications/otel-demo/values.yaml` here. Local Argo
-CD then detects the commit and reconciles the kind cluster.
+OpenSearch runs as one node with zero log-index replicas, a 400 MiB heap, a
+768 MiB request, and a 1,100 MiB limit. A PostSync job applies zero replicas to
+current and future log indices. Security is disabled for this internal local
+demo, with no external OpenSearch ingress. Storage is ephemeral: recreating the
+pod removes indexed logs.
 
-The GitHub repository must be public for anonymous Argo CD access, or private
-repository credentials must be configured in the local Argo CD installation.
+For direct index checks, keep this running:
 
-## Local telemetry
-
-Traces are exported to Jaeger, metrics to Prometheus, and application logs to
-OpenSearch. In Grafana, open Explore and choose the OpenSearch data source to
-search `otel-logs-*`. The local data source uses a daily index pattern so the
-Grafana plugin resolves concrete index names for health checks. All three data sources are provisioned together from local values so the
-upstream wildcard definition cannot overwrite it. The Collector also prints
-basic batch summaries.
-
-OpenSearch runs as one local node with zero replicas, a 400 MiB Java heap, a 768 MiB memory
-request, and a 1,100 MiB memory limit. Storage is ephemeral: recreating its pod
-removes indexed logs. This is a local demo configuration with the security plugin
-disabled and no external OpenSearch ingress. A small Argo CD PostSync job applies
-a zero-replica template to future log indices and updates existing log indices.
-This keeps the log index healthy on one node without allocating a second node.
-
-To inspect the OpenSearch API locally:
-
-```sh
-kubectl --context kind-otel-demo -n opentelemetry-demo   port-forward svc/opensearch 9200:9200
+```bash
+kubectl --context kind-otel-demo -n opentelemetry-demo port-forward svc/opensearch 9200:9200
 ```
 
 In another terminal:
 
-```sh
+```bash
 curl 'http://localhost:9200/_cluster/health?pretty'
 curl 'http://localhost:9200/_cat/indices/otel-logs-*?v'
 curl 'http://localhost:9200/otel-logs-*/_search?size=1&pretty'
 ```
 
-Application container logs also remain available through `kubectl logs`.
+## Local settings
 
-## Frontend routing
+The frontend keeps upstream HTTP connections alive for 65 minutes to exceed
+Envoy's one-hour idle timeout. `KEEP_ALIVE_TIMEOUT` is in milliseconds.
 
-The frontend keeps upstream HTTP connections alive for 65 minutes, longer than
-Envoy's default one-hour idle timeout. This avoids reusing connections that
-Next.js has already closed. The standalone frontend image reads the
-`KEEP_ALIVE_TIMEOUT` environment variable in milliseconds.
+The optional flag editor is disabled locally. `/feature` and `/feature/` show an
+explanatory page from image-provider. Flagd still evaluates GitOps-managed flags,
+and `/flagservice/` remains available.
 
-The flag editor remains disabled locally. Requests to `/feature` and
-`/feature/` are served by the existing image-provider as an explanatory page,
-rather than being forwarded to the absent editor. The flagd evaluation service
-and `/flagservice/` route remain available.
-
-## Environment naming
-
-See the shared [naming and migration guide](https://github.com/lackito/otel-demo-apps/blob/main/docs/NAMING.md) for repository names, runtime identities, and the coordinated rename sequence.
-
-The three pinned `otel-demo-local-*` GHCR references are verified bootstrap
-artifacts from before the naming migration. They stay usable until the kind
-release workflows publish public `otel-demo-kind-*` packages and promote their
-verified full-SHA images. Repository renames do not rename registry packages.
+See [Names and repositories](https://github.com/lackito/otel-demo-apps/blob/main/docs/NAMING.md)
+for the shared naming reference and
+[Branching](https://github.com/lackito/otel-demo-apps/blob/main/docs/BRANCHING.md)
+for the application development routine.
