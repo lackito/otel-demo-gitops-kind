@@ -134,7 +134,7 @@ components:
   product-catalog:
     imageOverride:
       repository: ghcr.io/lackito/otel-demo-kind-product-catalog
-      tag: 5bc67f15c0e0d67d0b7f7f87f12df52ff5f69e8b
+      tag: a8328de13a141b680810a865913d46ea79358d1a
       pullPolicy: IfNotPresent
   ad:
     imageOverride:
