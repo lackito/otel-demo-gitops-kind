@@ -123,7 +123,7 @@ components:
     # Promoted by the Recommendation kind release workflow.
     imageOverride:
       repository: ghcr.io/lackito/otel-demo-kind-recommendation
-      tag: f755f4545c15a4ac3d34b62fc2648e89d5f68746
+      tag: a8328de13a141b680810a865913d46ea79358d1a
       pullPolicy: IfNotPresent
 
   flagd:
