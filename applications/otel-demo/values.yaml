@@ -68,7 +68,7 @@ grafana:
               - datasourceUid: webstore-traces
                 name: trace_id
 
-              - url: http://localhost:8080/jaeger/ui/trace/$${__value.raw}
+              - url: http://otel-demo.localhost/jaeger/ui/trace/$${__value.raw}
                 name: trace_id
                 urlDisplayLabel: View in Jaeger UI
         - name: Jaeger
@@ -146,6 +146,8 @@ components:
     envOverrides:
       - name: KEEP_ALIVE_TIMEOUT
         value: '3900000'
+      - name: PUBLIC_OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+        value: http://otel-demo.localhost/otlp-http/v1/traces
   image-provider:
     mountedConfigMaps:
       - name: kind-feature-page
