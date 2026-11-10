@@ -102,6 +102,7 @@ grafana:
             timeField: observedTimestamp
             version: 3.2.0
             interval: Daily
+
 opensearch:
   enabled: true
   config:
@@ -119,6 +120,10 @@ opensearch:
       memory: 1100Mi
 
 components:
+  accounting:
+    imageOverride:
+      tag: 3.0.0-accounting
+
   recommendation:
     # Promoted by the Recommendation kind release workflow.
     imageOverride:
@@ -131,16 +136,19 @@ components:
     # environment, both natively and through amd64 emulation. Keep the flagd
     # evaluation service and manage its flag document declaratively instead.
     sidecarContainers: []
+  
   product-catalog:
     imageOverride:
       repository: ghcr.io/lackito/otel-demo-kind-product-catalog
       tag: 7314d1c98b9ff704c47eb7c4162b85c2f16fa228
       pullPolicy: IfNotPresent
+  
   ad:
     imageOverride:
       repository: ghcr.io/lackito/otel-demo-kind-ad
       tag: 7314d1c98b9ff704c47eb7c4162b85c2f16fa228
       pullPolicy: IfNotPresent
+  
   frontend:
     # 65 minutes exceeds Envoy's one-hour upstream idle timeout.
     envOverrides:
@@ -148,6 +156,7 @@ components:
         value: '3900000'
       - name: PUBLIC_OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
         value: http://otel-demo.localhost/otlp-http/v1/traces
+  
   image-provider:
     mountedConfigMaps:
       - name: kind-feature-page
