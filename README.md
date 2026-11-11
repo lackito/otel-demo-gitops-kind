@@ -9,7 +9,7 @@ upstream chart with these values and Gateway API manifests.
 | Path | Purpose |
 | --- | --- |
 | [Application](argocd/applications/otel-demo.yaml) | Chart version, sources, destination, and sync policy |
-| [Values](applications/otel-demo/values.yaml) | Local resources, telemetry, and Ad/Product Catalog/Recommendation images |
+| [Values](applications/otel-demo/values.yaml) | Local resources, routing support, and telemetry |
 | [Manifests](applications/otel-demo/manifests/) | Gateway, HTTPRoute, and OpenSearch log-index settings |
 
 [otel-demo-infra-kind](https://github.com/lackito/otel-demo-infra-kind) creates
@@ -21,7 +21,11 @@ application configuration; source and releases live in
 
 ## Releases
 
-Qualifying changes on `otel-demo-apps/kind` trigger per-service ARM64 builds.
+Chart `0.42.6` uses upstream `3.1.0` images for the baseline. Verify checkout
+and telemetry on kind before restoring Ad, PostgreSQL-backed Product Catalog,
+and Recommendation, in that order.
+
+When custom releases resume, qualifying changes on `otel-demo-apps/kind` trigger per-service ARM64 builds.
 Each workflow publishes `ghcr.io/lackito/otel-demo-kind-<service>:<full-sha>`,
 verifies public access, and updates that service's image override here.
 Argo CD watches `main` and reconciles Application `otel-demo-kind`.
