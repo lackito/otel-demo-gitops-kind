@@ -123,7 +123,6 @@ components:
     # environment, both natively and through amd64 emulation. Keep the flagd
     # evaluation service and manage its flag document declaratively instead.
     sidecarContainers: []
-  
   frontend:
     # 65 minutes exceeds Envoy's one-hour upstream idle timeout.
     envOverrides:
@@ -131,7 +130,7 @@ components:
         value: '3900000'
       - name: PUBLIC_OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
         value: http://otel-demo.localhost/otlp-http/v1/traces
-  
+
   image-provider:
     mountedConfigMaps:
       - name: kind-feature-page
@@ -155,3 +154,8 @@ components:
               </main>
             </body>
             </html>
+  ad:
+    imageOverride:
+      repository: ghcr.io/lackito/otel-demo-kind-ad
+      tag: 6784d43c23b30ff40ae696b5f57b36539e02d7e6
+      pullPolicy: IfNotPresent
