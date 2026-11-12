@@ -159,3 +159,8 @@ components:
       repository: ghcr.io/lackito/otel-demo-kind-ad
       tag: 6784d43c23b30ff40ae696b5f57b36539e02d7e6
       pullPolicy: IfNotPresent
+  product-catalog:
+    imageOverride:
+      repository: ghcr.io/lackito/otel-demo-kind-product-catalog
+      tag: ad30de0b3aede7cf67022219e0eb74305614bac2
+      pullPolicy: IfNotPresent
